@@ -26,13 +26,13 @@ public class TaskController {
         return taskRespository.findAll();
     }
 
-    // @PutMapping
-    // public Task createTask(@RequestBody Task task){
-    //     return taskRespository.save(task);
-    // }
-
     @PostMapping
-    public void cadastrarTask(@RequestBody Task task){
-        System.out.println(task.getName());
+    public Task createTask(@RequestBody Task task){
+        return taskRespository.save(task);
     }
+
+    // @PostMapping
+    // public void cadastrarTask(@RequestBody Task task){
+    //     System.out.println(task.getName());
+    // }
 }
