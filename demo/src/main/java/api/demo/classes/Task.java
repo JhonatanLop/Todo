@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
+    @Id
     @Column(name = "tsk_id")
     private long id;
     @Column(name = "tsk_name")
