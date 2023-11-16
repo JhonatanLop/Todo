@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,9 +32,9 @@ public class Task {
     @Column(name = "tsk_description")
     private String description;
 
-    @NotNull
     @Column(name = "tsk_finish_date")
     private Date dueDate;
+
     @Column(name = "tsk_completed")
     private boolean completed;
 }
