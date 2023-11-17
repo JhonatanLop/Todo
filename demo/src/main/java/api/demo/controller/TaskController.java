@@ -43,7 +43,7 @@ public class TaskController {
         return taskRespository.save(task);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id){
         taskRespository.deleteById(id);
     }
