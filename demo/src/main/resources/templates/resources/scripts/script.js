@@ -20,6 +20,15 @@ function getDadosDoBackend() {
 
                 cardHeader.appendChild(title);
 
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '&#x2715;'; // Ou o ícone de lixo
+                deleteButton.classList.add('delete-button');
+                deleteButton.addEventListener('click', () => {
+                    deleteCard(item.id, card); // Chame a função para excluir o card pelo ID
+                });
+
+                cardHeader.appendChild(deleteButton);
+
                 const cardContent = document.createElement('div');
                 cardContent.classList.add('card_content');
                 cardContent.innerHTML = `
@@ -40,57 +49,19 @@ function getDadosDoBackend() {
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('myModal');
-    const btn = document.getElementById('insert_task');
-    const span = document.getElementsByClassName('close')[0];
-
-    btn.addEventListener('click', () => {
-        modal.style.display = 'block';
-    });
-
-    span.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', event => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
+function deleteCard(cardId, cardElement) {
+    fetch(`http://localhost:8080/task/${cardId}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao excluir o card.');
         }
+        console.log('Card excluído com sucesso!');
+        cardElement.remove(); // Remove o card da interface após a exclusão
+    })
+    .catch(error => {
+        console.error('Erro ao excluir o card:', error);
+        // Trate possíveis erros
     });
-
-    const form = document.getElementById('taskForm');
-    form.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const formData = new FormData(form);
-        const taskData = {
-            name: formData.get('name'),
-            description: formData.get('description'),
-            dueDate: formData.get('dueDate'),
-            completed: formData.get('completed') === 'on'
-        };
-
-        fetch('http://localhost:8080/task', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao enviar os dados para o servidor.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Nova tarefa criada:', data);
-            modal.style.display = 'none';
-            form.reset();
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-        });
-    });
-});
+}
