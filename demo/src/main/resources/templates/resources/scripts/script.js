@@ -40,11 +40,7 @@ function getData(url) {
                 const editButton = document.createElement('button');
                 editButton.innerHTML = 'Editar';
                 editButton.classList.add('edit-button');
-                editButton.addEventListener('click', () => {
-                    // abre formulário para edição
-                    atualizarTarefa(item.id); // Chame a função para editar a tarefa pelo ID
-                });
-
+                addUpdateEvent(editButton, item.id);
                 cardHeader.appendChild(editButton);
 
                 const cardContent = document.createElement('div');
@@ -68,23 +64,50 @@ function getData(url) {
 }
 
 
-function deleteCard(cardId, cardElement) {
-    fetch(`http://localhost:8080/task/${cardId}`, {
-        method: 'DELETE',
+
+// Função para atualizar tarefa
+function updateTask(id) {
+    const taskData = {
+        // Aqui você pode adicionar os dados da tarefa que deseja atualizar
+    };
+
+    fetch(`http://localhost:8080/task/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao excluir o card.');
-            }
-            console.log('Card excluído com sucesso!');
-            cardElement.remove(); // Remove o card da interface após a exclusão
-        })
-        .catch(error => {
-            console.error('Erro ao excluir o card:', error);
-            // Trate possíveis erros
-        });
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao enviar os dados para o servidor.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Tarefa atualizada:', data);
+        modal.style.display = 'none';
+        form.reset();
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
 }
 
+// adiciona evento para atualizar tarefa
+function addUpdateEvent(editButton, id) {
+    editButton.addEventListener('click', () => {
+        const modal = document.getElementById('myModal');
+        modal.style.display = 'block';
+
+        const form = document.getElementById('taskForm');
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            updateTask(id, formData);
+        });
+    });
+}
 
 
 function enviarRequisicao() {
@@ -109,58 +132,89 @@ function enviarRequisicao() {
 }
 
 // evento para abrir o formulário de edição
-document.addEventListener('DOMContentLoaded', () => {
+function createTask(formData) {
+    const taskData = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        dueDate: formData.get('dueDate'),
+        completed: formData.get('completed') === 'on'
+    };
+
+    fetch('http://localhost:8080/task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao enviar os dados para o servidor.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Nova tarefa criada:', data);
+            closeModal();
+            resetForm();
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+}
+
+function openModal() {
     const modal = document.getElementById('myModal');
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'none';
+}
+
+function resetForm() {
+    const form = document.getElementById('taskForm');
+    form.reset();
+}
+
+function deleteCard(cardId, cardElement) {
+    fetch(`http://localhost:8080/task/${cardId}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao excluir o card.');
+        }
+        console.log('Card excluído com sucesso!');
+        cardElement.remove(); // Remove o card da interface após a exclusão
+    })
+    .catch(error => {
+        console.error('Erro ao excluir o card:', error);
+        // Trate possíveis erros
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('insert_task');
     const span = document.getElementsByClassName('close')[0];
 
-    btn.addEventListener('click', () => {
-        modal.style.display = 'block';
-    });
+    btn.addEventListener('click', openModal);
 
-    span.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
+    span.addEventListener('click', closeModal);
 
     window.addEventListener('click', event => {
+        const modal = document.getElementById('myModal');
         if (event.target === modal) {
-            modal.style.display = 'none';
+            closeModal();
         }
     });
 
     const form = document.getElementById('taskForm');
     form.addEventListener('submit', event => {
         event.preventDefault();
-
         const formData = new FormData(form);
-        const taskData = {
-            name: formData.get('name'),
-            description: formData.get('description'),
-            dueDate: formData.get('dueDate'),
-            completed: formData.get('completed') === 'on'
-        };
-
-        fetch('http://localhost:8080/task', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskData)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao enviar os dados para o servidor.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Nova tarefa criada:', data);
-                modal.style.display = 'none';
-                form.reset();
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-            });
+        createTask(formData);
     });
 });
 
