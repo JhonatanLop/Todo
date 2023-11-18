@@ -28,6 +28,11 @@
             return taskRespository.findAll();
         }
 
+        @GetMapping("/{name}")
+        public List<Task> getTaskByName(@PathVariable String name){
+            return taskRespository.findByName(name);
+        }
+
         @PostMapping
         public Task createTask(@RequestBody Task task){
             return taskRespository.save(task);

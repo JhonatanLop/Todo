@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     getDadosDoBackend();
-    const addButton = document.getElementById('addButton');
-    addButton.addEventListener('click', adicionarTarefa);
-});
+    const searcbutton = document.getElementById('search_button');
+    searcbutton.addEventListener('click', () => {
+        enviarRequisicao();
+    })
+}
+);
 
 function getDadosDoBackend() {
     const dadosDiv = document.getElementById('panel');
@@ -166,3 +169,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 });
+
+function enviarRequisicao() {
+    const input = document.getElementById('search'); // substitua 'inputId' pelo ID do seu input
+    const inputValue = input.value;
+
+    fetch(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Dados recebidos:', data);
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            // Trate possíveis erros
+        });
+}
