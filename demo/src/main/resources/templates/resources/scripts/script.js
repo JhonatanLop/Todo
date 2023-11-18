@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    getDadosDoBackend();
+    getData();
     const searcbutton = document.getElementById('search_button');
     searcbutton.addEventListener('click', () => {
         enviarRequisicao();
@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 );
 
-function getDadosDoBackend(url, targetElementId) {
-    const dadosDiv = document.getElementById(targetElementId);
+// Função para buscar os dados do backend
+function getData(url) {
+    const dadosDiv = document.getElementById('panel');
 
     fetch(url)
         .then(response => response.json())
@@ -40,7 +41,8 @@ function getDadosDoBackend(url, targetElementId) {
                 editButton.innerHTML = 'Editar';
                 editButton.classList.add('edit-button');
                 editButton.addEventListener('click', () => {
-                    editarTarefa(item.id); // Chame a função para editar a tarefa pelo ID
+                    // abre formulário para edição
+                    atualizarTarefa(item.id); // Chame a função para editar a tarefa pelo ID
                 });
 
                 cardHeader.appendChild(editButton);
@@ -65,13 +67,6 @@ function getDadosDoBackend(url, targetElementId) {
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    getDadosDoBackend('http://localhost:8080/task', 'panel');
-    const searcbutton = document.getElementById('search_button');
-    searcbutton.addEventListener('click', () => {
-        enviarRequisicao();
-    })
-});
 
 function deleteCard(cardId, cardElement) {
     fetch(`http://localhost:8080/task/${cardId}`, {
@@ -90,42 +85,30 @@ function deleteCard(cardId, cardElement) {
         });
 }
 
-function atualizarTarefa(taskId) {
-    const form = document.getElementById('taskForm');
-    const formData = new FormData(form);
 
-    const taskData = {
-        name: formData.get('name'),
-        description: formData.get('description'),
-        dueDate: formData.get('dueDate'),
-        completed: formData.get('completed') === 'on'
-    };
 
-    fetch(`http://localhost:8080/task/${taskId}`, {
-        method: 'PUT',
+function enviarRequisicao() {
+    const input = document.getElementById('search'); // substitua 'inputId' pelo ID do seu input
+    const inputValue = input.value;
+
+    fetch(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(taskData)
+        }
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao enviar os dados para o servidor.');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Tarefa atualizada:', data);
-            // Realizar as ações necessárias após a atualização
-
-            // Open the form for creation
-            form.reset();
+            console.log('Dados recebidos:', data);
+            getData(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`)
         })
         .catch(error => {
-            console.error('Erro:', error);
+            console.error('Erro na requisição:', error);
+            // Trate possíveis erros
         });
 }
 
+// evento para abrir o formulário de edição
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('myModal');
     const btn = document.getElementById('insert_task');
@@ -181,25 +164,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function enviarRequisicao() {
-    const input = document.getElementById('search'); // substitua 'inputId' pelo ID do seu input
-    const inputValue = input.value;
-
-    fetch(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Dados recebidos:', data);
-            getDadosDoBackend(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, 'panel')
-        })
-        .catch(error => {
-            console.error('Erro na requisição:', error);
-            // Trate possíveis erros
-        });
-}
-
-getDadosDoBackend('http://localhost:8080/task', 'panel');
+getData('http://localhost:8080/task');
