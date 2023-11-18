@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 );
 
-function getDadosDoBackend() {
-    const dadosDiv = document.getElementById('panel');
+function getDadosDoBackend(url, targetElementId) {
+    const dadosDiv = document.getElementById(targetElementId);
 
-    fetch('http://localhost:8080/task')
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             dadosDiv.innerHTML = ''; // Limpa o painel antes de adicionar novos cards
@@ -59,11 +59,19 @@ function getDadosDoBackend() {
                 dadosDiv.appendChild(card);
             });
         })
-        .catch(error => {
+        .catch(error => { //crie uma função para atualizar o objeto com base no id. deve-se abrir o mesmo formulário para criação. a função deve 
             console.error('Erro na requisição:', error);
             // Trate possíveis erros
         });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    getDadosDoBackend('http://localhost:8080/task', 'panel');
+    const searcbutton = document.getElementById('search_button');
+    searcbutton.addEventListener('click', () => {
+        enviarRequisicao();
+    })
+});
 
 function deleteCard(cardId, cardElement) {
     fetch(`http://localhost:8080/task/${cardId}`, {
@@ -82,7 +90,7 @@ function deleteCard(cardId, cardElement) {
         });
 }
 
-function editarTarefa(taskId) {
+function atualizarTarefa(taskId) {
     const form = document.getElementById('taskForm');
     const formData = new FormData(form);
 
@@ -109,6 +117,9 @@ function editarTarefa(taskId) {
         .then(data => {
             console.log('Tarefa atualizada:', data);
             // Realizar as ações necessárias após a atualização
+
+            // Open the form for creation
+            form.reset();
         })
         .catch(error => {
             console.error('Erro:', error);
@@ -183,9 +194,12 @@ function enviarRequisicao() {
         .then(response => response.json())
         .then(data => {
             console.log('Dados recebidos:', data);
+            getDadosDoBackend(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, 'panel')
         })
         .catch(error => {
             console.error('Erro na requisição:', error);
             // Trate possíveis erros
         });
 }
+
+getDadosDoBackend('http://localhost:8080/task', 'panel');
