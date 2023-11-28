@@ -15,6 +15,10 @@ public interface TaskRespository extends JpaRepository<Task, Long> {
     @Query(value = "select * from task", nativeQuery = true)
     public List<Task> findAll();
 
+    @Query(value = "select * from task where tsk_id = :id", nativeQuery = true)
+    public Task findById(@Param("id") long id);
+
+
     @Query(value = "select * from task where tsk_name like %:name%", nativeQuery = true)
     public List<Task> findByName(@Param("name") String name);
 

@@ -89,7 +89,7 @@ function enviarRequisicao() {
     const input = document.getElementById('search'); // substitua 'inputId' pelo ID do seu input
     const inputValue = input.value;
 
-    fetch(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`, {
+    fetch(`http://localhost:8080/task/name/${encodeURIComponent(inputValue)}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ function enviarRequisicao() {
         .then(response => response.json())
         .then(data => {
             console.log('Dados recebidos:', data);
-            getData(`http://localhost:8080/task/${encodeURIComponent(inputValue)}`)
+            getData(`http://localhost:8080/task/name/${encodeURIComponent(inputValue)}`)
         })
         .catch(error => {
             console.error('Erro na requisição:', error);
@@ -171,41 +171,37 @@ function deleteCard(cardId, cardElement) {
 }
 
 // abre formulário com os dados preenchidos da tarefa selecionada
-function updateForm(id) {
-    fetch(`http://localhost:8080/task/${id}`)
-        .then(response => response.json())
-        .then(taskData => {
-            // Preencher o formulário com os dados da tarefa
-            const modal_name = document.getElementById('name');
-            const modal_description = document.getElementById('description');
-            const modal_dueDate = document.getElementById('dueDate');
-            const modal_completed = document.getElementById('completed');
+async function updateForm(id) {
+    try {
+        console.log(id);
+        // Buscar os dados da tarefa pelo ID
+        const response = await fetch(`http://localhost:8080/task/id/${id}`);
+        // transformar os dados em JSON
+        const taskData = await response.json();
 
-            modal_name.value = taskData.name;
-            modal_description.value = taskData.description;
-            modal_dueDate.value = taskData.dueDate ? taskData.dueDate : '';
-            modal_completed.checked = taskData.completed;
+        // referenciar o modal
+        const form = document.getElementById('taskForm');
+        // preencher os campos do formulário com os dados da tarefa
+        form.name.value = taskData.name;
+        form.description.value = taskData.description;
+        form.dueDate.value = taskData.dueDate;
+        form.completed.checked = taskData.completed;
 
-            // Retornar os dados da tarefa para serem usados na atualização
-            return {
-                name: modal_name.value,
-                description: modal_description.value,
-                dueDate: modal_dueDate.value,
-                completed: modal_completed.checked
-            };
-        })
-        .catch(error => {
-            console.error('Erro ao buscar os dados da tarefa:', error);
-            // Trate possíveis erros
-        });
+        // retornar o formulário preenchido
+        const formData = new FormData(form);
+        return formData;
+    } catch (error) {
+        console.error('Erro ao buscar os dados da tarefa:', error);
+        // Trate possíveis erros
+    };
 }
 
 
 // Função para atualizar tarefa
-function updateTask(id) {
-    const taskData = updateForm(id);
+async function updateTask(id) {
+    const taskData = await updateForm(id);
 
-    fetch(`http://localhost:8080/task/${id}`, {
+    fetch(`http://localhost:8080/task/id/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -241,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     span.addEventListener('click', closeModal);
 
+    // Fechar o modal quando o usuário clicar fora da área do modal
     window.addEventListener('click', event => {
         const modal = document.getElementById('myModal');
         if (event.target === modal) {
@@ -249,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const form = document.getElementById('taskForm');
+
     form.addEventListener('submit', event => {
         event.preventDefault();
         const formData = new FormData(form);
