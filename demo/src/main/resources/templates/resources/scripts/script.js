@@ -173,19 +173,22 @@ function deleteCard(cardId, cardElement) {
 // abre formulário com os dados preenchidos da tarefa selecionada
 async function updateForm(id) {
     try {
-        console.log(id);
         // Buscar os dados da tarefa pelo ID
-        const response = await fetch(`http://localhost:8080/task/id/${id}`);
-        // transformar os dados em JSON
-        const taskData = await response.json();
-
-        // referenciar o modal
-        const form = document.getElementById('taskForm');
-        // preencher os campos do formulário com os dados da tarefa
-        form.name.value = taskData.name;
-        form.description.value = taskData.description;
-        form.dueDate.value = taskData.dueDate;
-        form.completed.checked = taskData.completed;
+        if (typeof id === 'number') {
+            const response = await fetch(`http://localhost:8080/task/id/${id}`);
+            // transformar os dados em JSON
+            const taskData = await response.json();
+    
+            // referenciar o modal
+            const form = document.getElementById('taskForm');
+            // preencher os campos do formulário com os dados da tarefa
+            form.name.value = taskData.name;
+            form.description.value = taskData.description;
+            form.dueDate.value = taskData.dueDate;
+            form.completed.checked = taskData.completed;
+        } else {
+            console.error('ID is not a nmber: ', id);
+        }
 
         // retornar o formulário preenchido
         const formData = new FormData(form);
