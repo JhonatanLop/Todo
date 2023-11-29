@@ -189,15 +189,28 @@ async function updateForm(id) {
         if (typeof id === 'number') {
             const response = await fetch(`http://localhost:8080/task/id/${id}`);
             // transformar os dados em JSON
-            const taskData = await response.json();
+            const dbResponse = await response.json();
 
             // referenciar o modal
             const form = document.getElementById('updateTaskForm');
             // preencher os campos do formulário com os dados da tarefa
-            form.name.value = taskData.name;
-            form.description.value = taskData.description;
-            form.dueDate.value = taskData.dueDate;
-            form.completed.checked = taskData.completed;
+            form.updateName.value = dbResponse.name;
+            form.updateDescription.value = dbResponse.description;
+            form.updateDueDate.value = dbResponse.dueDate;
+            form.updateCompleted.checked = dbResponse.completed;
+
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const taskData = {
+                    name: form.updateName.value,
+                    description: form.updateDescription.value,
+                    dueDate: form.updateDueDate.value,
+                    completed: form.updateCompleted.checked
+                }
+                updateTask(id,taskData);
+            });
         } else {
             console.error('ID is not a nmber: ', id);
         }
@@ -210,9 +223,9 @@ async function updateForm(id) {
 // Função para atualizar tarefa
 async function updateTask(id, taskData) {
     const modal = document.getElementById('updateModal');
-    const form = document.getElementById('taskForm');
+    const form = document.getElementById('updateTaskForm');
 
-    fetch(`http://localhost:8080/task/id/${id}`, {
+    fetch(`http://localhost:8080/task/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
