@@ -35,15 +35,16 @@ function getData(url) {
                     deleteCard(item.id, card); // Chame a função para excluir o card pelo ID
                 });
 
-                cardHeader.appendChild(deleteButton);
-
+                
                 const editButton = document.createElement('button');
                 editButton.innerHTML = 'Editar';
                 editButton.classList.add('edit-button');
                 addUpdateEvent(editButton, item.id)
                 editButton.setAttribute('data-id', item.id); // Definir o ID da tarefa como um atributo do botão de edição
+                
                 cardHeader.appendChild(editButton);
-
+                cardHeader.appendChild(deleteButton);
+                
 
                 const cardContent = document.createElement('div');
                 cardContent.classList.add('card_content');
