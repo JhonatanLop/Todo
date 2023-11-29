@@ -40,9 +40,8 @@ function getData(url) {
                 const editButton = document.createElement('button');
                 editButton.innerHTML = 'Editar';
                 editButton.classList.add('edit-button');
-                addUpdateEvent(editButton, item.id);
+                addUpdateEvent(editButton, item.id)
                 editButton.setAttribute('data-id', item.id); // Definir o ID da tarefa como um atributo do botão de edição
-                addUpdateEvent(editButton);
                 cardHeader.appendChild(editButton);
 
 
@@ -70,8 +69,11 @@ function getData(url) {
 // adiciona evento para atualizar tarefa
 function addUpdateEvent(editButton, id) {
     editButton.addEventListener('click', () => {
-        const modal = document.getElementById('myModal');
+        const modal = document.getElementById('updateModal');
         modal.style.display = 'block';
+
+        const span = document.getElementsByClassName('close')[0];
+        span.addEventListener('click', () => { closeModal('updateModal') });
 
         updateForm(id);
 
@@ -130,7 +132,7 @@ function createTask(formData) {
         })
         .then(data => {
             console.log('Nova tarefa criada:', data);
-            closeModal();
+            closeModal(myModal);
             resetForm();
         })
         .catch(error => {
@@ -138,13 +140,16 @@ function createTask(formData) {
         });
 }
 
-function openModal() {
-    const modal = document.getElementById('myModal');
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
     modal.style.display = 'block';
+
+    const spam = document.getElementsByClassName('close')
+    spam.addEventListener('click', () => { closeModal(modalId) })
 }
 
-function closeModal() {
-    const modal = document.getElementById('myModal');
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
     modal.style.display = 'none';
 }
 
@@ -178,9 +183,9 @@ async function updateForm(id) {
             const response = await fetch(`http://localhost:8080/task/id/${id}`);
             // transformar os dados em JSON
             const taskData = await response.json();
-    
+
             // referenciar o modal
-            const form = document.getElementById('taskForm');
+            const form = document.getElementById('updateTaskForm');
             // preencher os campos do formulário com os dados da tarefa
             form.name.value = taskData.name;
             form.description.value = taskData.description;
@@ -189,20 +194,14 @@ async function updateForm(id) {
         } else {
             console.error('ID is not a nmber: ', id);
         }
-
-        // retornar o formulário preenchido
-        const formData = new FormData(form);
-        return formData;
     } catch (error) {
         console.error('Erro ao buscar os dados da tarefa:', error);
-        // Trate possíveis erros
     };
 }
 
 
 // Função para atualizar tarefa
-async function updateTask(id) {
-    const taskData = await updateForm(id);
+async function updateTask(id, taskData) {
 
     fetch(`http://localhost:8080/task/id/${id}`, {
         method: 'PUT',
@@ -227,24 +226,28 @@ async function updateTask(id) {
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const btn_update = document.getElementById('edit-button');
-    btn_update.addEventListener('click', openModal);
-})
+// adicona evento para abrir modal no botão de edição
+// document.addEventListener('DOMContentLoaded', () => {
+//     // const span = document.getElementsByClassName('close');
+//     // span.addEventListener('click', () => {closeModal('updateModal')});
+// })
 
+// adiciona evento para abrir modal para criar nova tarefa
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('insert_task');
     const span = document.getElementsByClassName('close')[0];
 
-    btn.addEventListener('click', openModal);
+    btn.addEventListener('click', () => { openModal('myModal') });
 
-    span.addEventListener('click', closeModal);
+    span.addEventListener('click', () => { closeModal('myModal') });
 
     // Fechar o modal quando o usuário clicar fora da área do modal
     window.addEventListener('click', event => {
         const modal = document.getElementById('myModal');
-        if (event.target === modal) {
-            closeModal();
+        const updt_modal = document.getElementById('updateModal');
+        if (event.target === modal || event.target === updt_modal) {
+            closeModal('myModal');
+            closeModal('updateModal');
         }
     });
 

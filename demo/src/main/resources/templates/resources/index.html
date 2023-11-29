@@ -50,6 +50,28 @@
             </form>
         </div>
     </div>
+    
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Atualizar Tarefa</h2>
+            <form id="updateTaskForm">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" required><br><br>
+
+                <label for="description">Descrição:</label>
+                <textarea id="description" name="description"></textarea><br><br>
+
+                <label for="dueDate">Data de Vencimento:</label>
+                <input type="date" id="dueDate" name="dueDate"><br><br>
+
+                <label for="completed">Concluída:</label>
+                <input type="checkbox" id="completed" name="completed"><br><br>
+
+                <button type="updt_submit">Salvar</button>
+            </form>
+        </div>
+    </div>
 
 </body>
 <script src="./scripts/script.js"></script>
