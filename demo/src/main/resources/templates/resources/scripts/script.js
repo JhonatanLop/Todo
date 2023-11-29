@@ -72,12 +72,15 @@ function addUpdateEvent(editButton, id) {
         const modal = document.getElementById('updateModal');
         modal.style.display = 'block';
 
-        const span = document.getElementsByClassName('close')[0];
+        const span = document.getElementsByClassName('close')[1];
         span.addEventListener('click', () => { closeModal('updateModal') });
 
         updateForm(id);
 
         const form = document.getElementById('taskForm');
+        // remove todos os eventos listeners anteriores
+        form.replaceWith(form.cloneNode(true));
+        // adiciona o evento ao novo form
         form.addEventListener('submit', event => {
             event.preventDefault();
             const formData = new FormData(form);
@@ -144,7 +147,11 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.style.display = 'block';
 
-    const spam = document.getElementsByClassName('close')
+    if (modalId === 'myModal') {
+        const spam = document.getElementsByClassName('close')[0];
+    } else {
+        const spam = document.getElementsByClassName('edit-close')[0];
+    }
     spam.addEventListener('click', () => { closeModal(modalId) })
 }
 
@@ -202,6 +209,8 @@ async function updateForm(id) {
 
 // Função para atualizar tarefa
 async function updateTask(id, taskData) {
+    const modal = document.getElementById('updateModal');
+    const form = document.getElementById('taskForm');
 
     fetch(`http://localhost:8080/task/id/${id}`, {
         method: 'PUT',
@@ -225,12 +234,6 @@ async function updateTask(id, taskData) {
             console.error('Erro:', error);
         });
 }
-
-// adicona evento para abrir modal no botão de edição
-// document.addEventListener('DOMContentLoaded', () => {
-//     // const span = document.getElementsByClassName('close');
-//     // span.addEventListener('click', () => {closeModal('updateModal')});
-// })
 
 // adiciona evento para abrir modal para criar nova tarefa
 document.addEventListener('DOMContentLoaded', () => {
