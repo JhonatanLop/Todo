@@ -257,6 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         const formData = new FormData(form);
         createTask(formData);
+        closeModal('myModal');
+        location.reload();
     });
 });
 
